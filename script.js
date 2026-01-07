@@ -1,4 +1,4 @@
-// ========== ПРЕДЗАГРУЗКА ВСЕХ ФАЙЛОВ ==========
+// ========== ПРЕДЗАГРУЗКА ТОЛЬКО ВАЖНЫХ ФАЙЛОВ ==========
 document.addEventListener('DOMContentLoaded', function() {
     const continueBtn = document.getElementById('continueBtn');
     const loader = document.getElementById('loader');
@@ -21,19 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
     continueBtn.style.pointerEvents = 'none';
     continueBtn.style.transform = 'translateY(20px)';
     
-    // Список файлов для загрузки
+    // Список файлов для загрузки - ТОЛЬКО ВАЖНЫЕ (без MP3)
     const filesToLoad = [
         'wallpaper.jpg',
         'track1.png',
         'track2.png',
         'track3.jpg',
         'track4.jpg',
-        'track5.jpg',
-        'LE SSERAFIM - SPAGHETTI.mp3',
-        'Big Baby Tape - Ameli.mp3',
-        'КАЙФЫ - Белок ты менял.mp3',
-        'Нервы - Батареи.mp3',
-        'Goo Goo Dolls - Sympathy.mp3'
+        'track5.jpg'
     ];
     
     let loadedCount = 0;
@@ -78,24 +73,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Загружаем каждый файл
+    // Загружаем визуальные файлы
     filesToLoad.forEach(file => {
-        if (file.endsWith('.mp3')) {
-            // Для аудиофайлов
-            const audio = new Audio();
-            audio.src = file;
-            audio.preload = 'auto';
-            
-            audio.onloadeddata = updateProgress;
-            audio.onerror = updateProgress;
-        } else {
-            // Для изображений
-            const img = new Image();
-            img.src = file;
-            
-            img.onload = updateProgress;
-            img.onerror = updateProgress;
-        }
+        const img = new Image();
+        img.src = file;
+        
+        img.onload = updateProgress;
+        img.onerror = () => {
+            console.warn(`Не удалось загрузить: ${file}`);
+            updateProgress(); // Все равно считаем загруженным, чтобы не блокировать
+        };
     });
 });
 
@@ -115,6 +102,7 @@ volFill.style.width = '33%';
 
 let currentTrack = null;
 let isSeeking = false;
+let autoPlayAttempted = false;
 
 // Форматирование времени
 function format(t) {
@@ -134,7 +122,7 @@ function showControls(track) {
     playBtn.textContent = '⏸';
     
     // Установить длительность если трек уже загружен
-    if (audio.src === track.dataset.src && !isNaN(audio.duration)) {
+    if (audio.src && audio.src.includes(track.dataset.src) && !isNaN(audio.duration)) {
         dur.textContent = format(audio.duration);
     }
 }
@@ -181,30 +169,29 @@ function playTrack(track) {
     currentTrack = track;
     
     // Загрузить новый трек если нужно
-    if (audio.src !== src) {
+    if (!audio.src || !audio.src.includes(src)) {
         audio.src = src;
-        audio.load();
         
-        // Проверяем, не загружен ли трек уже
-        if (audio.readyState >= 3) {
+        // Показываем контролы сразу
+        showControls(track);
+        
+        // Устанавливаем длительность
+        audio.onloadedmetadata = () => {
             const dur = track.querySelector('.dur');
             dur.textContent = format(audio.duration);
-            audio.play();
-            playBtn.textContent = '⏸';
-        } else {
-            audio.onloadeddata = () => {
-                const dur = track.querySelector('.dur');
-                dur.textContent = format(audio.duration);
-                audio.play();
-                playBtn.textContent = '⏸';
-            };
-        }
-    } else {
-        audio.play();
-        playBtn.textContent = '⏸';
+        };
+        
+        audio.load();
     }
     
-    showControls(track);
+    // Пытаемся воспроизвести
+    audio.play().then(() => {
+        playBtn.textContent = '⏸';
+    }).catch(error => {
+        console.log('Ошибка воспроизведения:', error);
+        // Показываем кнопку play если автовоспроизведение заблокировано
+        playBtn.textContent = '▶';
+    });
 }
 
 // Обновление прогресса трека
@@ -296,9 +283,43 @@ continueBtn.onclick = () => {
         document.body.style.background = `url('wallpaper.jpg') no-repeat center center fixed`;
         document.body.style.backgroundSize = 'cover';
         
-        // Воспроизвести 5-й трек (он уже должен быть загружен)
-        if (tracks[4]) {
-            playTrack(tracks[4]);
+        // Воспроизвести 5-й трек (Goo Goo Dolls - Sympathy)
+        if (tracks[4] && !autoPlayAttempted) {
+            autoPlayAttempted = true;
+            
+            // Устанавливаем трек для автовоспроизведения
+            const autoplayTrack = tracks[4];
+            const autoplaySrc = autoplayTrack.dataset.src;
+            
+            // Устанавливаем как текущий трек
+            currentTrack = autoplayTrack;
+            
+            // Показываем контролы
+            showControls(autoplayTrack);
+            
+            // Устанавливаем источник и пытаемся воспроизвести
+            audio.src = autoplaySrc;
+            audio.load();
+            
+            // Ждем загрузки метаданных
+            audio.onloadedmetadata = () => {
+                const dur = autoplayTrack.querySelector('.dur');
+                dur.textContent = format(audio.duration);
+                
+                // Пытаемся автовоспроизвести
+                audio.play().then(() => {
+                    autoplayTrack.querySelector('.play').textContent = '⏸';
+                    console.log('Автовоспроизведение успешно');
+                }).catch(error => {
+                    console.log('Автовоспроизведение заблокировано. Нажмите на трек для начала.', error);
+                    // Оставляем кнопку в состоянии play
+                    autoplayTrack.querySelector('.play').textContent = '▶';
+                });
+            };
+            
+            audio.onerror = () => {
+                console.error('Ошибка загрузки трека для автовоспроизведения');
+            };
         }
         
         // Прокрутить к верху страницы после загрузки

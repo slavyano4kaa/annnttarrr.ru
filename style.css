@@ -1,0 +1,423 @@
+* { 
+    box-sizing: border-box; 
+    font-family: 'Raleway', Arial, sans-serif; 
+}
+
+body { 
+    margin: 0; 
+    background: #f6d6e8 url('wallpaper.jpg') no-repeat center center fixed; 
+	background-size: 1920px auto;
+    min-height: 100vh;
+}
+
+#loader {
+    position: fixed; 
+    inset: 0;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    background: #f6d6e8;
+    z-index: 1000;
+}
+
+#loader button {
+    padding: 15px 36px; 
+    font-size: 18px;
+    border-radius: 20px; 
+    border: 2px solid #d6a4c8;
+    background: white; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#loader button:hover {
+    background: #f8f0f5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(214, 164, 200, 0.3);
+}
+
+.hidden { display: none; }
+
+.page { 
+    /* display: flex; 
+    justify-content: center; */
+    padding: 40px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card {
+    background: white; 
+    border-radius: 26px;
+    border: 2px solid #e3b7d6; 
+    padding: 30px; 
+    width: 520px;
+    max-width: 100%;
+    margin: 0 auto;
+    box-shadow: 0 8px 32px rgba(183, 137, 181, 0.1);
+}
+
+.avatar { 
+    width: 140px; 
+    height: 140px; 
+    margin: auto; 
+    border-radius: 50%; 
+    overflow: hidden; 
+    border: 3px solid #e3b7d6;
+}
+.avatar img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+.nickname { 
+    text-align: center; 
+    font-size: 28px; 
+    margin-top: 16px;
+    color: #333;
+    letter-spacing: 1px;
+}
+
+.divider { 
+    text-align: center; 
+    margin: 24px 0; 
+    color: #b889b5; 
+    font-size: 14px;
+    letter-spacing: 2px;
+}
+
+.bio { 
+    text-align: center; 
+    line-height: 1.6;
+    font-size: 15px;
+    color: #555;
+}
+
+.socials {
+    display: flex; 
+    justify-content: center; 
+    gap: 18px; 
+    margin-top: 24px;
+}
+.socials img {
+    width: 34px; 
+    height: 34px; 
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    border-radius: 8px;
+}
+.socials img:hover {
+    transform: scale(1.15) rotate(5deg);
+    filter: brightness(1.1);
+}
+
+/* Стили для заголовка треков */
+.tracks-header {
+    text-align: center;
+    font-size: 14px;
+    color: #b889b5;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+/* Стили для компактных треков */
+.track { 
+    display: flex; 
+    gap: 12px; 
+    margin-bottom: 5px; 
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 14px;
+    transition: background-color 0.2s ease;
+    align-items: center;
+}
+
+.track:hover {
+    background-color: rgba(233, 207, 225, 0.25);
+}
+
+.track:active {
+    background-color: rgba(233, 207, 225, 0.35);
+    transform: scale(0.99);
+}
+
+.track img { 
+    width: 68px; 
+    height: 68px; 
+    border-radius: 10px; 
+    object-fit: cover; 
+    flex-shrink: 0;
+}
+
+.info { 
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.title { 
+    font-weight: 600; 
+    font-size: 14px; 
+    margin-bottom: 3px; 
+    line-height: 1.2;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artist { 
+    font-size: 12px; 
+    opacity: 0.65; 
+    margin-bottom: 6px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.controls { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    margin-top: 0;
+}
+
+.play { 
+    font-size: 15px; 
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    color: #b86fa6; 
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.play:hover {
+    background-color: rgba(184, 111, 166, 0.1);
+}
+
+.bar { 
+    flex: 1; 
+    height: 5px; 
+    background: #ecd3e4; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    position: relative;
+    flex-shrink: 1;
+    min-width: 60px;
+}
+
+.fill { 
+    height: 100%; 
+    width: 0%; 
+    background: #c985b6; 
+    border-radius: 8px; 
+    transition: width 0.1s linear;
+}
+
+.cur, .dur { 
+    font-size: 10px; 
+    width: 34px; 
+    text-align: center; 
+    user-select: none;
+    opacity: 0.7;
+    color: #777;
+    flex-shrink: 0;
+}
+
+.volume {
+    position: fixed; 
+    right: 20px; 
+    bottom: 20px; 
+    width: 100px;
+    z-index: 10;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid #e3b7d6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.vol-text {
+    font-size: 11px;
+    color: #777;
+    margin-bottom: 6px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+    opacity: 0.7;
+}
+
+.vol-bar { 
+    height: 5px; 
+    background: #ecd3e4; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    position: relative;
+}
+
+.vol-fill { 
+    height: 100%; 
+    width: 33%; 
+    background: #c985b6; 
+    border-radius: 8px; 
+}
+
+.flag {
+    width: 16px;
+    height: 12px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
+    border: 1px solid black;
+    border-radius: 1px;
+}
+
+.sheher {
+    font-size: 0.85em;  /* меньше на 15% */
+    opacity: 0.7;       /* светлее */
+    margin-left: 2px;   /* небольшой отступ */
+}
+
+.footer {
+    margin-top: 10px; /* прижимает футер к низу */
+    margin-bottom: 10px; /* отступ снизу */
+    text-align: center;
+    font-size: 13px;
+    color: black;
+    font-weight: 200;
+}
+
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .page {
+        padding: 20px 15px;
+    }
+    
+    .card {
+        padding: 24px;
+    }
+    
+    .avatar {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .nickname {
+        font-size: 24px;
+    }
+    
+    .bio {
+        font-size: 14px;
+    }
+    
+    .socials {
+        gap: 16px;
+    }
+    
+    .socials img {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .track {
+        gap: 10px;
+        padding: 8px;
+    }
+    
+    .track img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .title {
+        font-size: 13px;
+    }
+    
+    .artist {
+        font-size: 11px;
+    }
+    
+    .play {
+        font-size: 14px;
+        width: 24px;
+        height: 24px;
+    }
+    
+    .volume {
+        right: 15px;
+        bottom: 15px;
+        width: 90px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 20px;
+    }
+    
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .nickname {
+        font-size: 22px;
+    }
+    
+    .track {
+        gap: 8px;
+    }
+    
+    .track img {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .controls {
+        gap: 6px;
+    }
+    
+    .cur, .dur {
+        width: 30px;
+        font-size: 9px;
+    }
+}
+
+#sakura-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.sakura-heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #ffb6c1, #ff69b4);
+    clip-path: path('M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z');
+    opacity: 0.7;
+    filter: drop-shadow(0 0 3px rgba(255, 182, 193, 0.5));
+    animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}

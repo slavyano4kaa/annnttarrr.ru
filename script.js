@@ -1,3 +1,47 @@
+// ========== ПРЕДЗАГРУЗКА ФОНА ==========
+document.addEventListener('DOMContentLoaded', function() {
+    const bgImage = new Image();
+    const continueBtn = document.getElementById('continueBtn');
+    
+    // Сначала скрываем кнопку
+    continueBtn.style.opacity = '0';
+    continueBtn.style.pointerEvents = 'none';
+    continueBtn.style.transform = 'translateY(20px)';
+    
+    // Загружаем фоновое изображение
+    bgImage.src = 'wallpaper.jpg';
+    
+    // Когда изображение загрузится
+    bgImage.onload = function() {
+        console.log('Фоновое изображение загружено');
+        
+        // Обновляем фон лоадера
+        const loader = document.getElementById('loader');
+        loader.style.background = `url('${bgImage.src}') no-repeat center center`;
+        loader.style.backgroundSize = 'cover';
+        loader.style.transition = 'background 0.5s ease';
+        
+        // Показываем кнопку с анимацией
+        setTimeout(() => {
+            continueBtn.style.opacity = '1';
+            continueBtn.style.transform = 'translateY(0)';
+            continueBtn.style.pointerEvents = 'auto';
+            continueBtn.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+        }, 300);
+    };
+    
+    // Обработка ошибки загрузки
+    bgImage.onerror = function() {
+        console.error('Ошибка загрузки фонового изображения');
+        // Показываем кнопку даже если изображение не загрузилось
+        continueBtn.style.opacity = '1';
+        continueBtn.style.transform = 'translateY(0)';
+        continueBtn.style.pointerEvents = 'auto';
+        continueBtn.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    };
+});
+
+// ========== ОСНОВНОЙ КОД ПЛЕЕРА ==========
 const audio = document.getElementById('audio');
 const tracks = document.querySelectorAll('.track');
 const loader = document.getElementById('loader');
@@ -172,15 +216,26 @@ tracks.forEach(track => {
 
 // Кнопка continue
 continueBtn.onclick = () => {
-    loader.style.display = 'none';
-    page.classList.remove('hidden');
-    volume.classList.remove('hidden');
+    // Плавно скрываем лоадер
+    loader.style.opacity = '0';
+    loader.style.pointerEvents = 'none';
+    loader.style.transition = 'opacity 0.5s ease';
     
-    // Воспроизвести 5-й трек
-    playTrack(tracks[4]);
-    
-    // Прокрутить к верху страницы после загрузки
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+        loader.style.display = 'none';
+        page.classList.remove('hidden');
+        volume.classList.remove('hidden');
+        
+        // Устанавливаем фон для основного body
+        document.body.style.background = `url('wallpaper.jpg') no-repeat center center fixed`;
+        document.body.style.backgroundSize = 'cover';
+        
+        // Воспроизвести 5-й трек
+        playTrack(tracks[4]);
+        
+        // Прокрутить к верху страницы после загрузки
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 500);
 };
 
 // Регулировка громкости
@@ -231,26 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loader.style.display = 'flex';
     page.classList.add('hidden');
     volume.classList.add('hidden');
-    
-    // Добавляем класс loaded для плавного появления
-    setTimeout(() => {
-        document.body.classList.add('loaded');
-    }, 100);
 });
-
-// Добавляем плавное появление для loader
-window.addEventListener('load', () => {
-    const loaderBtn = document.getElementById('continueBtn');
-    loaderBtn.style.opacity = '0';
-    loaderBtn.style.transform = 'translateY(10px)';
-    
-    setTimeout(() => {
-        loaderBtn.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-        loaderBtn.style.opacity = '1';
-        loaderBtn.style.transform = 'translateY(0)';
-    }, 300);
-});
-
 
 // Эффект падающих сердечек сакуры
 function createSakuraEffect() {
@@ -348,7 +384,7 @@ function createSakuraEffect() {
     container._sakuraInterval = intervalId;
 }
 
-// Запускаем эффект как можно раньше
+// Запускаем эффект сакуры после загрузки страницы
 window.addEventListener('load', () => {
     // Небольшая задержка для отображения loader
     setTimeout(() => {
@@ -356,7 +392,7 @@ window.addEventListener('load', () => {
     }, 100);
 });
 
-// Также запускаем при готовности DOM (на всякий случай)
+// Также запускаем при готовности DOM
 document.addEventListener('DOMContentLoaded', () => {
     // Если уже запустили через load, не запускаем повторно
     if (!document.getElementById('sakura-container')) {

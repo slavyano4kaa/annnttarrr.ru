@@ -1,44 +1,102 @@
-// ========== ПРЕДЗАГРУЗКА ФОНА ==========
+// ========== ПРЕДЗАГРУЗКА ВСЕХ ФАЙЛОВ ==========
 document.addEventListener('DOMContentLoaded', function() {
-    const bgImage = new Image();
     const continueBtn = document.getElementById('continueBtn');
+    const loader = document.getElementById('loader');
     
-    // Сначала скрываем кнопку
+    // Создаем контейнер для прогресс-бара
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'progress-container';
+    progressContainer.innerHTML = `
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="progress-text">0%</div>
+    `;
+    
+    // Вставляем прогресс-бар перед кнопкой
+    continueBtn.parentNode.insertBefore(progressContainer, continueBtn);
+    
+    // Скрываем кнопку
     continueBtn.style.opacity = '0';
     continueBtn.style.pointerEvents = 'none';
     continueBtn.style.transform = 'translateY(20px)';
     
-    // Загружаем фоновое изображение
-    bgImage.src = 'wallpaper.jpg';
+    // Список файлов для загрузки
+    const filesToLoad = [
+        'wallpaper.jpg',
+        'track1.png',
+        'track2.png',
+        'track3.jpg',
+        'track4.jpg',
+        'track5.jpg',
+        'LE SSERAFIM - SPAGHETTI.mp3',
+        'Big Baby Tape - Ameli.mp3',
+        'КАЙФЫ - Белок ты менял.mp3',
+        'Нервы - Батареи.mp3',
+        'Goo Goo Dolls - Sympathy.mp3'
+    ];
     
-    // Когда изображение загрузится
-    bgImage.onload = function() {
-        console.log('Фоновое изображение загружено');
-        
-        // Обновляем фон лоадера
-        const loader = document.getElementById('loader');
-        loader.style.background = `url('${bgImage.src}') no-repeat center center`;
-        loader.style.backgroundSize = 'cover';
-        loader.style.transition = 'background 0.5s ease';
-        
-        // Показываем кнопку с анимацией
-        setTimeout(() => {
-            continueBtn.style.opacity = '1';
-            continueBtn.style.transform = 'translateY(0)';
-            continueBtn.style.pointerEvents = 'auto';
-            continueBtn.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        }, 300);
-    };
+    let loadedCount = 0;
+    const totalFiles = filesToLoad.length;
     
-    // Обработка ошибки загрузки
-    bgImage.onerror = function() {
-        console.error('Ошибка загрузки фонового изображения');
-        // Показываем кнопку даже если изображение не загрузилось
-        continueBtn.style.opacity = '1';
-        continueBtn.style.transform = 'translateY(0)';
-        continueBtn.style.pointerEvents = 'auto';
-        continueBtn.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-    };
+    // Функция обновления прогресса
+    function updateProgress() {
+        loadedCount++;
+        const percent = Math.round((loadedCount / totalFiles) * 100);
+        
+        const progressFill = document.querySelector('.progress-fill');
+        const progressText = document.querySelector('.progress-text');
+        
+        if (progressFill && progressText) {
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = `${percent}%`;
+            
+            // Когда все файлы загружены
+            if (loadedCount === totalFiles) {
+                // Обновляем фон лоадера
+                loader.style.background = `url('wallpaper.jpg') no-repeat center center`;
+                loader.style.backgroundSize = 'cover';
+                loader.style.transition = 'background 0.5s ease';
+                
+                // Прячем прогресс-бар и показываем кнопку
+                setTimeout(() => {
+                    progressContainer.style.opacity = '0';
+                    progressContainer.style.transform = 'translateY(-10px)';
+                    progressContainer.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    
+                    setTimeout(() => {
+                        progressContainer.remove();
+                        
+                        // Показываем кнопку
+                        continueBtn.style.opacity = '1';
+                        continueBtn.style.transform = 'translateY(0)';
+                        continueBtn.style.pointerEvents = 'auto';
+                        continueBtn.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+                    }, 500);
+                }, 500);
+            }
+        }
+    }
+    
+    // Загружаем каждый файл
+    filesToLoad.forEach(file => {
+        if (file.endsWith('.mp3')) {
+            // Для аудиофайлов
+            const audio = new Audio();
+            audio.src = file;
+            audio.preload = 'auto';
+            
+            audio.onloadeddata = updateProgress;
+            audio.onerror = updateProgress;
+        } else {
+            // Для изображений
+            const img = new Image();
+            img.src = file;
+            
+            img.onload = updateProgress;
+            img.onerror = updateProgress;
+        }
+    });
 });
 
 // ========== ОСНОВНОЙ КОД ПЛЕЕРА ==========
@@ -127,12 +185,20 @@ function playTrack(track) {
         audio.src = src;
         audio.load();
         
-        audio.onloadedmetadata = () => {
+        // Проверяем, не загружен ли трек уже
+        if (audio.readyState >= 3) {
             const dur = track.querySelector('.dur');
             dur.textContent = format(audio.duration);
             audio.play();
             playBtn.textContent = '⏸';
-        };
+        } else {
+            audio.onloadeddata = () => {
+                const dur = track.querySelector('.dur');
+                dur.textContent = format(audio.duration);
+                audio.play();
+                playBtn.textContent = '⏸';
+            };
+        }
     } else {
         audio.play();
         playBtn.textContent = '⏸';
@@ -230,8 +296,10 @@ continueBtn.onclick = () => {
         document.body.style.background = `url('wallpaper.jpg') no-repeat center center fixed`;
         document.body.style.backgroundSize = 'cover';
         
-        // Воспроизвести 5-й трек
-        playTrack(tracks[4]);
+        // Воспроизвести 5-й трек (он уже должен быть загружен)
+        if (tracks[4]) {
+            playTrack(tracks[4]);
+        }
         
         // Прокрутить к верху страницы после загрузки
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -280,14 +348,6 @@ audio.addEventListener('pause', () => {
     }
 });
 
-// При загрузке страницы скрыть всё кроме loader
-document.addEventListener('DOMContentLoaded', () => {
-    // Убедимся что только loader виден
-    loader.style.display = 'flex';
-    page.classList.add('hidden');
-    volume.classList.add('hidden');
-});
-
 // Эффект падающих сердечек сакуры
 function createSakuraEffect() {
     // Создаем контейнер если его нет
@@ -332,10 +392,10 @@ function createSakuraEffect() {
         
         // Параметры анимации
         const duration = 10 + Math.random() * 15;
-        const driftX = (Math.random() - 0.5) * 150; // дрейф по X
+        const driftX = (Math.random() - 0.5) * 150;
         const endRotation = startRotation + 180 + Math.random() * 180;
         
-        // Создаем анимацию с помощью Web Animations API
+        // Создаем анимацию
         const animation = petal.animate([
             {
                 transform: `translate(0, 0) rotate(${startRotation}deg)`,
@@ -378,15 +438,14 @@ function createSakuraEffect() {
         } else {
             clearInterval(intervalId);
         }
-    }, 300); // новый лепесток каждые 300мс
+    }, 300);
     
-    // Сохраняем ID интервала для возможной очистки
+    // Сохраняем ID интервала
     container._sakuraInterval = intervalId;
 }
 
 // Запускаем эффект сакуры после загрузки страницы
 window.addEventListener('load', () => {
-    // Небольшая задержка для отображения loader
     setTimeout(() => {
         createSakuraEffect();
     }, 100);
@@ -394,7 +453,6 @@ window.addEventListener('load', () => {
 
 // Также запускаем при готовности DOM
 document.addEventListener('DOMContentLoaded', () => {
-    // Если уже запустили через load, не запускаем повторно
     if (!document.getElementById('sakura-container')) {
         setTimeout(() => {
             createSakuraEffect();

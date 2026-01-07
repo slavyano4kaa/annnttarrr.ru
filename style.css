@@ -3,6 +3,68 @@
     font-family: 'Raleway', Arial, sans-serif; 
 }
 
+/* ========== ПРОГРЕСС-БАР ЗАГРУЗКИ ========== */
+.progress-container {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-width: 80%;
+    text-align: center;
+    z-index: 1001;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 1px solid rgba(214, 164, 200, 0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffb6c1, #d6a4c8, #b889b5);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(214, 164, 200, 0.5);
+}
+
+.progress-text {
+    font-size: 14px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* Адаптивность для прогресс-бара */
+@media (max-width: 768px) {
+    .progress-container {
+        width: 250px;
+        bottom: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-container {
+        width: 200px;
+        bottom: 70px;
+    }
+    
+    .progress-bar {
+        height: 6px;
+    }
+    
+    .progress-text {
+        font-size: 12px;
+    }
+}
+
 body { 
     margin: 0; 
     background: #f6d6e8 url('wallpaper.jpg') no-repeat center center fixed; 

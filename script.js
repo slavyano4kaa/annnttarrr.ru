@@ -1,9 +1,9 @@
-// ========== ПРЕДЗАГРУЗКА ТОЛЬКО ВАЖНЫХ ФАЙЛОВ ==========
+
 document.addEventListener('DOMContentLoaded', function() {
     const continueBtn = document.getElementById('continueBtn');
     const loader = document.getElementById('loader');
     
-    // Создаем контейнер для прогресс-бара
+    
     const progressContainer = document.createElement('div');
     progressContainer.className = 'progress-container';
     progressContainer.innerHTML = `
@@ -13,15 +13,15 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="progress-text">0%</div>
     `;
     
-    // Вставляем прогресс-бар перед кнопкой
+    
     continueBtn.parentNode.insertBefore(progressContainer, continueBtn);
     
-    // Скрываем кнопку
+    
     continueBtn.style.opacity = '0';
     continueBtn.style.pointerEvents = 'none';
     continueBtn.style.transform = 'translateY(20px)';
     
-    // Список файлов для загрузки - ТОЛЬКО ВАЖНЫЕ (без MP3)
+    
     const filesToLoad = [
         'wallpaper.jpg',
         'track1.png',
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let loadedCount = 0;
     const totalFiles = filesToLoad.length;
     
-    // Функция обновления прогресса
+    
     function updateProgress() {
         loadedCount++;
         const percent = Math.round((loadedCount / totalFiles) * 100);
@@ -46,14 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
             progressFill.style.width = `${percent}%`;
             progressText.textContent = `${percent}%`;
             
-            // Когда все файлы загружены
+            
             if (loadedCount === totalFiles) {
-                // Обновляем фон лоадера
+                
                 loader.style.background = `url('wallpaper.jpg') no-repeat center center`;
                 loader.style.backgroundSize = 'cover';
                 loader.style.transition = 'background 0.5s ease';
                 
-                // Прячем прогресс-бар и показываем кнопку
+                
                 setTimeout(() => {
                     progressContainer.style.opacity = '0';
                     progressContainer.style.transform = 'translateY(-10px)';
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         progressContainer.remove();
                         
-                        // Показываем кнопку
+                        
                         continueBtn.style.opacity = '1';
                         continueBtn.style.transform = 'translateY(0)';
                         continueBtn.style.pointerEvents = 'auto';
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Загружаем визуальные файлы
+    
     filesToLoad.forEach(file => {
         const img = new Image();
         img.src = file;
@@ -81,12 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
         img.onload = updateProgress;
         img.onerror = () => {
             console.warn(`Не удалось загрузить: ${file}`);
-            updateProgress(); // Все равно считаем загруженным, чтобы не блокировать
+            updateProgress(); 
         };
     });
 });
 
-// ========== ОСНОВНОЙ КОД ПЛЕЕРА ==========
+
 const audio = document.getElementById('audio');
 const tracks = document.querySelectorAll('.track');
 const loader = document.getElementById('loader');
@@ -96,7 +96,7 @@ const volume = document.querySelector('.volume');
 const volBar = document.querySelector('.vol-bar');
 const volFill = document.querySelector('.vol-fill');
 
-// Начальная громкость
+
 audio.volume = 0.33;
 volFill.style.width = '33%';
 
@@ -104,7 +104,7 @@ let currentTrack = null;
 let isSeeking = false;
 let autoPlayAttempted = false;
 
-// Форматирование времени
+
 function format(t) {
     if (isNaN(t) || t === Infinity) return "0:00";
     const m = Math.floor(t / 60);
@@ -112,7 +112,7 @@ function format(t) {
     return `${m}:${s}`;
 }
 
-// Показать контролы трека
+
 function showControls(track) {
     const controls = track.querySelector('.controls');
     const playBtn = track.querySelector('.play');
@@ -121,13 +121,13 @@ function showControls(track) {
     controls.classList.remove('hidden');
     playBtn.textContent = '⏸';
     
-    // Установить длительность если трек уже загружен
+    
     if (audio.src && audio.src.includes(track.dataset.src) && !isNaN(audio.duration)) {
         dur.textContent = format(audio.duration);
     }
 }
 
-// Скрыть контролы трека и сбросить состояние
+
 function hideControls(track) {
     const controls = track.querySelector('.controls');
     const playBtn = track.querySelector('.play');
@@ -142,12 +142,12 @@ function hideControls(track) {
     dur.textContent = '0:00';
 }
 
-// Воспроизведение трека
+
 function playTrack(track) {
     const src = track.dataset.src;
     const playBtn = track.querySelector('.play');
     
-    // Если кликнули на тот же трек
+    
     if (currentTrack === track) {
         if (audio.paused) {
             audio.play();
@@ -159,23 +159,23 @@ function playTrack(track) {
         return;
     }
     
-    // Если есть другой играющий трек
+    
     if (currentTrack && currentTrack !== track) {
         audio.pause();
         hideControls(currentTrack);
     }
     
-    // Установить новый текущий трек
+    
     currentTrack = track;
     
-    // Загрузить новый трек если нужно
+    
     if (!audio.src || !audio.src.includes(src)) {
         audio.src = src;
         
-        // Показываем контролы сразу
+        
         showControls(track);
         
-        // Устанавливаем длительность
+        
         audio.onloadedmetadata = () => {
             const dur = track.querySelector('.dur');
             dur.textContent = format(audio.duration);
@@ -184,17 +184,17 @@ function playTrack(track) {
         audio.load();
     }
     
-    // Пытаемся воспроизвести
+    
     audio.play().then(() => {
         playBtn.textContent = '⏸';
     }).catch(error => {
         console.log('Ошибка воспроизведения:', error);
-        // Показываем кнопку play если автовоспроизведение заблокировано
+        
         playBtn.textContent = '▶';
     });
 }
 
-// Обновление прогресса трека
+
 function updateProgress() {
     if (!currentTrack || audio.paused || isSeeking) return;
     
@@ -207,28 +207,28 @@ function updateProgress() {
         fill.style.width = `${percent}%`;
         cur.textContent = format(audio.currentTime);
         
-        // Обновить длительность на случай если изменилась
+        
         dur.textContent = format(audio.duration);
     }
 }
 
-// Обработчики для треков
+
 tracks.forEach(track => {
     const playBtn = track.querySelector('.play');
     
-    // Клик на кнопку воспроизведения
+    
     playBtn.onclick = (e) => {
         e.stopPropagation();
         playTrack(track);
     };
     
-    // Клик на весь трек
+    
     track.onclick = (e) => {
         if (e.target === playBtn || e.target.closest('.bar') || e.target.closest('.controls')) return;
         playTrack(track);
     };
     
-    // Перемотка по клику на таймлайн
+    
     const bar = track.querySelector('.bar');
     bar.onmousedown = (e) => {
         if (!currentTrack || currentTrack !== track) return;
@@ -267,9 +267,9 @@ tracks.forEach(track => {
     };
 });
 
-// Кнопка continue
+
 continueBtn.onclick = () => {
-    // Плавно скрываем лоадер
+    
     loader.style.opacity = '0';
     loader.style.pointerEvents = 'none';
     loader.style.transition = 'opacity 0.5s ease';
@@ -279,40 +279,40 @@ continueBtn.onclick = () => {
         page.classList.remove('hidden');
         volume.classList.remove('hidden');
         
-        // Устанавливаем фон для основного body
+        
         document.body.style.background = `url('wallpaper.jpg') no-repeat center center fixed`;
         document.body.style.backgroundSize = 'cover';
         
-        // Воспроизвести 5-й трек (Goo Goo Dolls - Sympathy)
+        
         if (tracks[4] && !autoPlayAttempted) {
             autoPlayAttempted = true;
             
-            // Устанавливаем трек для автовоспроизведения
+            
             const autoplayTrack = tracks[4];
             const autoplaySrc = autoplayTrack.dataset.src;
             
-            // Устанавливаем как текущий трек
+            
             currentTrack = autoplayTrack;
             
-            // Показываем контролы
+            
             showControls(autoplayTrack);
             
-            // Устанавливаем источник и пытаемся воспроизвести
+            
             audio.src = autoplaySrc;
             audio.load();
             
-            // Ждем загрузки метаданных
+            
             audio.onloadedmetadata = () => {
                 const dur = autoplayTrack.querySelector('.dur');
                 dur.textContent = format(audio.duration);
                 
-                // Пытаемся автовоспроизвести
+                
                 audio.play().then(() => {
                     autoplayTrack.querySelector('.play').textContent = '⏸';
                     console.log('Автовоспроизведение успешно');
                 }).catch(error => {
                     console.log('Автовоспроизведение заблокировано. Нажмите на трек для начала.', error);
-                    // Оставляем кнопку в состоянии play
+                    
                     autoplayTrack.querySelector('.play').textContent = '▶';
                 });
             };
@@ -322,12 +322,12 @@ continueBtn.onclick = () => {
             };
         }
         
-        // Прокрутить к верху страницы после загрузки
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 500);
 };
 
-// Регулировка громкости
+
 volBar.onmousedown = (e) => {
     const rect = volBar.getBoundingClientRect();
     const updateVolume = (clientX) => {
@@ -348,7 +348,7 @@ volBar.onmousedown = (e) => {
     document.addEventListener('mouseup', onMouseUp);
 };
 
-// События аудио
+
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', () => {
     if (currentTrack) {
@@ -369,9 +369,9 @@ audio.addEventListener('pause', () => {
     }
 });
 
-// Эффект падающих сердечек сакуры
+
 function createSakuraEffect() {
-    // Создаем контейнер если его нет
+    
     let container = document.getElementById('sakura-container');
     if (!container) {
         container = document.createElement('div');
@@ -379,44 +379,44 @@ function createSakuraEffect() {
         document.body.appendChild(container);
     }
     
-    // Цвета сердечек
+    
     const colors = [
         '#ffb6c1', '#ffc0cb', '#ffb7c5', '#ffa6c9',
         '#ff91a4', '#ffccd5', '#ffafcc', '#ffcad4'
     ];
     
-    // Создание одного лепестка
+    
     function createPetal() {
         const petal = document.createElement('div');
         petal.className = 'sakura-heart';
         
-        // Случайный размер
+        
         const size = 10 + Math.random() * 20;
         petal.style.width = `${size}px`;
         petal.style.height = `${size}px`;
         
-        // Случайный цвет
+        
         const color1 = colors[Math.floor(Math.random() * colors.length)];
         const color2 = colors[Math.floor(Math.random() * colors.length)];
         petal.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
         
-        // Начальная позиция
+        
         petal.style.left = `${Math.random() * 100}vw`;
         petal.style.top = `-30px`;
         
-        // Случайные параметры
+        
         petal.style.opacity = `${0.4 + Math.random() * 0.6}`;
         const startRotation = Math.random() * 360;
         petal.style.transform = `rotate(${startRotation}deg)`;
         
         container.appendChild(petal);
         
-        // Параметры анимации
+        
         const duration = 10 + Math.random() * 15;
         const driftX = (Math.random() - 0.5) * 150;
         const endRotation = startRotation + 180 + Math.random() * 180;
         
-        // Создаем анимацию
+        
         const animation = petal.animate([
             {
                 transform: `translate(0, 0) rotate(${startRotation}deg)`,
@@ -439,7 +439,7 @@ function createSakuraEffect() {
             easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         });
         
-        // Удаляем лепесток после анимации
+        
         animation.onfinish = () => {
             if (petal.parentNode) {
                 petal.remove();
@@ -447,12 +447,12 @@ function createSakuraEffect() {
         };
     }
     
-    // Сразу создаем первую партию лепестков
+    
     for (let i = 0; i < 15; i++) {
         createPetal();
     }
     
-    // Запускаем интервал для постоянного создания
+    
     const intervalId = setInterval(() => {
         if (document.getElementById('sakura-container')) {
             createPetal();
@@ -461,18 +461,18 @@ function createSakuraEffect() {
         }
     }, 300);
     
-    // Сохраняем ID интервала
+    
     container._sakuraInterval = intervalId;
 }
 
-// Запускаем эффект сакуры после загрузки страницы
+
 window.addEventListener('load', () => {
     setTimeout(() => {
         createSakuraEffect();
     }, 100);
 });
 
-// Также запускаем при готовности DOM
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('sakura-container')) {
         setTimeout(() => {
@@ -480,3 +480,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 });
+
+
+
+(function () {
+    const container = document.getElementById("animated-name");
+    if (!container) return;
+
+    const text = container.textContent.trim();
+    if (!text) return;
+
+    container.textContent = "";
+
+    const spans = [];
+    for (const char of text) {
+        const span = document.createElement("span");
+        span.textContent = char;
+        container.appendChild(span);
+        spans.push(span);
+    }
+
+    const style = getComputedStyle(container);
+
+    function hexToRgb(hex) {
+        hex = hex.replace("#", "");
+        return {
+            r: parseInt(hex.slice(0, 2), 16),
+            g: parseInt(hex.slice(2, 4), 16),
+            b: parseInt(hex.slice(4, 6), 16)
+        };
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + [r, g, b].map(v => {
+            const h = v.toString(16);
+            return h.length === 1 ? "0" + h : h;
+        }).join("");
+    }
+
+    function interpolate(c1, c2, t) {
+        const a = hexToRgb(c1);
+        const b = hexToRgb(c2);
+        return rgbToHex(
+            Math.round(a.r + (b.r - a.r) * t),
+            Math.round(a.g + (b.g - a.g) * t),
+            Math.round(a.b + (b.b - a.b) * t)
+        );
+    }
+
+    const colorsRaw = style.getPropertyValue('--gradient-colors').trim();
+    let baseColors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : ["#ffb6c1", "#fff0d6"];
+
+    const steps = Math.max(spans.length * 2, 30);
+    const palette = [];
+    for (let i = 0; i < steps; i++) {
+        const t = i / (steps - 1);
+        const seg = t * (baseColors.length - 1);
+        const i0 = Math.floor(seg);
+        const i1 = Math.min(i0 + 1, baseColors.length - 1);
+        const localT = seg - i0;
+        palette.push(interpolate(baseColors[i0], baseColors[i1], localT));
+    }
+
+    let offset = 0;
+    const speed = 0.6; 
+
+    function update() {
+        offset = (offset + speed) % palette.length;
+
+        for (let i = 0; i < spans.length; i++) {
+            
+            const pos = (i * 1.2 + offset) % palette.length;
+
+            const i0 = Math.floor(pos);
+            const i1 = (i0 + 1) % palette.length;
+            const t = pos - i0;
+
+            const color = interpolate(palette[i0], palette[i1], t);
+            spans[i].style.color = color;
+        }
+    }
+
+    update();
+    setInterval(update, 40); 
+})();

@@ -481,7 +481,121 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+    const ACTIVE_USER = "user2";
 
+    let durationMs = 0;
+    let currentMs = 0;
+    let lastTrackId = null;
+    
+    let trackStartTimestamp = 0;
+    
+    function formatTime(ms) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+    
+    function parseTrackStartTime(isoString) {
+        if (!isoString) return 0;
+    
+        // ВАЖНО: принудительно считаем как UTC
+        return Date.parse(isoString + "Z");
+    }
+    
+    function calculateProgress(debug = false) {
+        if (!trackStartTimestamp || !durationMs) return 0;
+    
+        const now = Date.now();
+        const elapsed = now - trackStartTimestamp;
+    
+        const clamped = Math.min(Math.max(elapsed, 0), durationMs);
+    
+        if (debug) {
+            console.log("=== MUSIC DEBUG ===");
+            console.log("now (UTC ms):", now);
+            console.log("track_start (UTC ms):", trackStartTimestamp);
+            console.log("duration_ms:", durationMs);
+            console.log("raw elapsed (ms):", elapsed);
+            console.log("elapsed (sec):", (elapsed / 1000).toFixed(2));
+            console.log("clamped (ms):", clamped);
+            console.log("now ISO:", new Date(now).toISOString());
+            console.log("start ISO:", new Date(trackStartTimestamp).toISOString());
+            console.log("===================");
+        }
+    
+        return clamped;
+    }
+    
+    async function updateMusic() {
+        try {
+            const response = await fetch('https://slavya.space/bio/proxy.php');
+            const data = await response.json();
+    
+            const container = document.getElementById('track-container');
+            if (!container) return;
+    
+            const user = data?.[ACTIVE_USER];
+    
+            if (user && user.active) {
+                container.style.display = 'block';
+    
+                const newTrackId = user.track_id;
+    
+                if (newTrackId !== lastTrackId) {
+                    lastTrackId = newTrackId;
+    
+                    durationMs = user.duration_ms || 0;
+                    trackStartTimestamp = parseTrackStartTime(user.track_started_at);
+    
+                    currentMs = calculateProgress(true); // DEBUG ТОЛЬКО ПРИ СМЕНЕ ТРЕКА
+    
+                    if (currentMs > durationMs) currentMs = durationMs;
+                    if (currentMs < 0) currentMs = 0;
+                }
+    
+                document.getElementById('track-title').textContent = user.title || '';
+                document.getElementById('track-artist').textContent = user.artist || '';
+                document.getElementById('total-time').textContent = user.duration || '';
+    
+            } else {
+                container.style.display = 'none';
+                lastTrackId = null;
+                currentMs = 0;
+                trackStartTimestamp = 0;
+            }
+    
+        } catch (e) {
+            console.error('Ошибка музыки:', e);
+        }
+    }
+    
+    setInterval(() => {
+        const container = document.getElementById('track-container');
+    
+        if (container && container.style.display !== 'none' && durationMs > 0) {
+            currentMs = calculateProgress();
+    
+            if (currentMs > durationMs) currentMs = durationMs;
+            if (currentMs < 0) currentMs = 0;
+    
+            const percent = (currentMs / durationMs) * 100;
+    
+            const progressBar = document.getElementById('progress-bar');
+            const currentTime = document.getElementById('current-time');
+    
+            if (progressBar) {
+                progressBar.style.width = Math.min(percent, 100) + '%';
+            }
+    
+            if (currentTime) {
+                currentTime.textContent = formatTime(currentMs);
+            }
+        }
+    }, 1000);
+    
+    updateMusic();
+    setInterval(updateMusic, 5000);
 
 (function () {
     const container = document.getElementById("animated-name");

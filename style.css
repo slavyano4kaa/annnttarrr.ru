@@ -530,12 +530,18 @@ body {
 .mini-title { font-weight: 600; font-size: 13px; color: #333; }
 .mini-artist { font-size: 11px; color: #777; margin-bottom: 6px; }
 
+.mini-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .mini-bar {
+    flex: 1;
     height: 4px;
     background: #ecd3e4;
     border-radius: 4px;
     overflow: hidden;
-    margin: 6px 0;
 }
 
 .mini-fill {
@@ -544,7 +550,11 @@ body {
     background: #c985b6;
 }
 
-.mini-time {
+.mini-time-left,
+.mini-time-right {
     font-size: 10px;
     color: #999;
+    min-width: 35px;
+    text-align: center;
+    white-space: nowrap;
 }

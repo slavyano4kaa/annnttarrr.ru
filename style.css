@@ -516,3 +516,35 @@ body {
     color: inherit;
 }
 
+.mini-player {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid #e3b7d6;
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.mini-title { font-weight: 600; font-size: 13px; color: #333; }
+.mini-artist { font-size: 11px; color: #777; margin-bottom: 6px; }
+
+.mini-bar {
+    height: 4px;
+    background: #ecd3e4;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 6px 0;
+}
+
+.mini-fill {
+    height: 100%;
+    width: 0%;
+    background: #c985b6;
+}
+
+.mini-time {
+    font-size: 10px;
+    color: #999;
+}

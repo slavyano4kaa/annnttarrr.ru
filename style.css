@@ -527,8 +527,8 @@ body {
     width: 100%;
 }
 
-.mini-title { font-weight: 600; font-size: 13px; color: #333; }
-.mini-artist { font-size: 11px; color: #777; margin-bottom: 6px; }
+.mini-title { font-weight: 600; font-size: 15px; color: #333; }
+.mini-artist { font-size: 13px; color: #777; margin-bottom: 6px; }
 
 .mini-progress-row {
     display: flex;
@@ -552,7 +552,7 @@ body {
 
 .mini-time-left,
 .mini-time-right {
-    font-size: 10px;
+    font-size: 14px;
     color: #999;
     min-width: 35px;
     text-align: center;

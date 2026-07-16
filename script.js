@@ -1,8 +1,6 @@
-
 document.addEventListener('DOMContentLoaded', function() {
     const continueBtn = document.getElementById('continueBtn');
     const loader = document.getElementById('loader');
-    
     
     const progressContainer = document.createElement('div');
     progressContainer.className = 'progress-container';
@@ -13,14 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="progress-text">0%</div>
     `;
     
-    
     continueBtn.parentNode.insertBefore(progressContainer, continueBtn);
-    
     
     continueBtn.style.opacity = '0';
     continueBtn.style.pointerEvents = 'none';
     continueBtn.style.transform = 'translateY(20px)';
-    
     
     const filesToLoad = [
         'wallpaper.jpg',
@@ -34,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let loadedCount = 0;
     const totalFiles = filesToLoad.length;
     
-    
     function updateProgress() {
         loadedCount++;
         const percent = Math.round((loadedCount / totalFiles) * 100);
@@ -46,13 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
             progressFill.style.width = `${percent}%`;
             progressText.textContent = `${percent}%`;
             
-            
             if (loadedCount === totalFiles) {
-                
                 loader.style.background = `url('wallpaper.jpg') no-repeat center center`;
                 loader.style.backgroundSize = 'cover';
                 loader.style.transition = 'background 0.5s ease';
-                
                 
                 setTimeout(() => {
                     progressContainer.style.opacity = '0';
@@ -61,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     setTimeout(() => {
                         progressContainer.remove();
-                        
                         
                         continueBtn.style.opacity = '1';
                         continueBtn.style.transform = 'translateY(0)';
@@ -73,11 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    
     filesToLoad.forEach(file => {
         const img = new Image();
         img.src = file;
-        
         img.onload = updateProgress;
         img.onerror = () => {
             console.warn(`Не удалось загрузить: ${file}`);
@@ -85,7 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     });
 });
-
 
 const audio = document.getElementById('audio');
 const tracks = document.querySelectorAll('.track');
@@ -96,7 +83,6 @@ const volume = document.querySelector('.volume');
 const volBar = document.querySelector('.vol-bar');
 const volFill = document.querySelector('.vol-fill');
 
-
 audio.volume = 0.33;
 volFill.style.width = '33%';
 
@@ -104,14 +90,12 @@ let currentTrack = null;
 let isSeeking = false;
 let autoPlayAttempted = false;
 
-
 function format(t) {
     if (isNaN(t) || t === Infinity) return "0:00";
     const m = Math.floor(t / 60);
     const s = Math.floor(t % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
 }
-
 
 function showControls(track) {
     const controls = track.querySelector('.controls');
@@ -121,12 +105,10 @@ function showControls(track) {
     controls.classList.remove('hidden');
     playBtn.textContent = '⏸';
     
-    
     if (audio.src && audio.src.includes(track.dataset.src) && !isNaN(audio.duration)) {
         dur.textContent = format(audio.duration);
     }
 }
-
 
 function hideControls(track) {
     const controls = track.querySelector('.controls');
@@ -142,11 +124,9 @@ function hideControls(track) {
     dur.textContent = '0:00';
 }
 
-
 function playTrack(track) {
     const src = track.dataset.src;
     const playBtn = track.querySelector('.play');
-    
     
     if (currentTrack === track) {
         if (audio.paused) {
@@ -159,22 +139,16 @@ function playTrack(track) {
         return;
     }
     
-    
     if (currentTrack && currentTrack !== track) {
         audio.pause();
         hideControls(currentTrack);
     }
     
-    
     currentTrack = track;
-    
     
     if (!audio.src || !audio.src.includes(src)) {
         audio.src = src;
-        
-        
         showControls(track);
-        
         
         audio.onloadedmetadata = () => {
             const dur = track.querySelector('.dur');
@@ -184,16 +158,13 @@ function playTrack(track) {
         audio.load();
     }
     
-    
     audio.play().then(() => {
         playBtn.textContent = '⏸';
     }).catch(error => {
         console.log('Ошибка воспроизведения:', error);
-        
         playBtn.textContent = '▶';
     });
 }
-
 
 function updateProgress() {
     if (!currentTrack || audio.paused || isSeeking) return;
@@ -206,28 +177,22 @@ function updateProgress() {
         const percent = (audio.currentTime / audio.duration) * 100;
         fill.style.width = `${percent}%`;
         cur.textContent = format(audio.currentTime);
-        
-        
         dur.textContent = format(audio.duration);
     }
 }
 
-
 tracks.forEach(track => {
     const playBtn = track.querySelector('.play');
-    
     
     playBtn.onclick = (e) => {
         e.stopPropagation();
         playTrack(track);
     };
     
-    
     track.onclick = (e) => {
         if (e.target === playBtn || e.target.closest('.bar') || e.target.closest('.controls')) return;
         playTrack(track);
     };
-    
     
     const bar = track.querySelector('.bar');
     bar.onmousedown = (e) => {
@@ -267,9 +232,7 @@ tracks.forEach(track => {
     };
 });
 
-
 continueBtn.onclick = () => {
-    
     loader.style.opacity = '0';
     loader.style.pointerEvents = 'none';
     loader.style.transition = 'opacity 0.5s ease';
@@ -279,40 +242,30 @@ continueBtn.onclick = () => {
         page.classList.remove('hidden');
         volume.classList.remove('hidden');
         
-        
         document.body.style.background = `url('wallpaper.jpg') no-repeat center center fixed`;
         document.body.style.backgroundSize = 'cover';
-        
         
         if (tracks[4] && !autoPlayAttempted) {
             autoPlayAttempted = true;
             
-            
             const autoplayTrack = tracks[4];
             const autoplaySrc = autoplayTrack.dataset.src;
             
-            
             currentTrack = autoplayTrack;
-            
-            
             showControls(autoplayTrack);
-            
             
             audio.src = autoplaySrc;
             audio.load();
             
-            
             audio.onloadedmetadata = () => {
                 const dur = autoplayTrack.querySelector('.dur');
                 dur.textContent = format(audio.duration);
-                
                 
                 audio.play().then(() => {
                     autoplayTrack.querySelector('.play').textContent = '⏸';
                     console.log('Автовоспроизведение успешно');
                 }).catch(error => {
                     console.log('Автовоспроизведение заблокировано. Нажмите на трек для начала.', error);
-                    
                     autoplayTrack.querySelector('.play').textContent = '▶';
                 });
             };
@@ -322,11 +275,9 @@ continueBtn.onclick = () => {
             };
         }
         
-        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 500);
 };
-
 
 volBar.onmousedown = (e) => {
     const rect = volBar.getBoundingClientRect();
@@ -348,7 +299,6 @@ volBar.onmousedown = (e) => {
     document.addEventListener('mouseup', onMouseUp);
 };
 
-
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('ended', () => {
     if (currentTrack) {
@@ -369,9 +319,7 @@ audio.addEventListener('pause', () => {
     }
 });
 
-
 function createSakuraEffect() {
-    
     let container = document.getElementById('sakura-container');
     if (!container) {
         container = document.createElement('div');
@@ -379,31 +327,25 @@ function createSakuraEffect() {
         document.body.appendChild(container);
     }
     
-    
     const colors = [
         '#ffb6c1', '#ffc0cb', '#ffb7c5', '#ffa6c9',
         '#ff91a4', '#ffccd5', '#ffafcc', '#ffcad4'
     ];
     
-    
     function createPetal() {
         const petal = document.createElement('div');
         petal.className = 'sakura-heart';
-        
         
         const size = 10 + Math.random() * 20;
         petal.style.width = `${size}px`;
         petal.style.height = `${size}px`;
         
-        
         const color1 = colors[Math.floor(Math.random() * colors.length)];
         const color2 = colors[Math.floor(Math.random() * colors.length)];
         petal.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
         
-        
         petal.style.left = `${Math.random() * 100}vw`;
         petal.style.top = `-30px`;
-        
         
         petal.style.opacity = `${0.4 + Math.random() * 0.6}`;
         const startRotation = Math.random() * 360;
@@ -411,11 +353,9 @@ function createSakuraEffect() {
         
         container.appendChild(petal);
         
-        
         const duration = 10 + Math.random() * 15;
         const driftX = (Math.random() - 0.5) * 150;
         const endRotation = startRotation + 180 + Math.random() * 180;
-        
         
         const animation = petal.animate([
             {
@@ -439,7 +379,6 @@ function createSakuraEffect() {
             easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         });
         
-        
         animation.onfinish = () => {
             if (petal.parentNode) {
                 petal.remove();
@@ -447,11 +386,9 @@ function createSakuraEffect() {
         };
     }
     
-    
     for (let i = 0; i < 15; i++) {
         createPetal();
     }
-    
     
     const intervalId = setInterval(() => {
         if (document.getElementById('sakura-container')) {
@@ -461,17 +398,14 @@ function createSakuraEffect() {
         }
     }, 300);
     
-    
     container._sakuraInterval = intervalId;
 }
-
 
 window.addEventListener('load', () => {
     setTimeout(() => {
         createSakuraEffect();
     }, 100);
 });
-
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('sakura-container')) {
@@ -481,121 +415,119 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-    const ACTIVE_USER = "user2";
+const ACTIVE_USER = "user2";
 
-    let durationMs = 0;
-    let currentMs = 0;
-    let lastTrackId = null;
-    
-    let trackStartTimestamp = 0;
-    
-    function formatTime(ms) {
-        const totalSeconds = Math.floor(ms / 1000);
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+let durationMs = 0;
+let currentMs = 0;
+let lastTrackId = null;
+
+let trackStartTimestamp = 0;
+
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+}
+
+function parseTrackStartTime(isoString) {
+    if (!isoString) return 0;
+    return Date.parse(isoString + "Z");
+}
+
+function calculateProgress(debug = false) {
+    if (!trackStartTimestamp || !durationMs) return 0;
+
+    const now = Date.now();
+    const elapsed = now - trackStartTimestamp;
+
+    const clamped = Math.min(Math.max(elapsed, 0), durationMs);
+
+    if (debug) {
+        console.log("=== MUSIC DEBUG ===");
+        console.log("now (UTC ms):", now);
+        console.log("track_start (UTC ms):", trackStartTimestamp);
+        console.log("duration_ms:", durationMs);
+        console.log("raw elapsed (ms):", elapsed);
+        console.log("elapsed (sec):", (elapsed / 1000).toFixed(2));
+        console.log("clamped (ms):", clamped);
+        console.log("now ISO:", new Date(now).toISOString());
+        console.log("start ISO:", new Date(trackStartTimestamp).toISOString());
+        console.log("===================");
     }
-    
-    function parseTrackStartTime(isoString) {
-        if (!isoString) return 0;
-    
-        // ВАЖНО: принудительно считаем как UTC
-        return Date.parse(isoString + "Z");
-    }
-    
-    function calculateProgress(debug = false) {
-        if (!trackStartTimestamp || !durationMs) return 0;
-    
-        const now = Date.now();
-        const elapsed = now - trackStartTimestamp;
-    
-        const clamped = Math.min(Math.max(elapsed, 0), durationMs);
-    
-        if (debug) {
-            console.log("=== MUSIC DEBUG ===");
-            console.log("now (UTC ms):", now);
-            console.log("track_start (UTC ms):", trackStartTimestamp);
-            console.log("duration_ms:", durationMs);
-            console.log("raw elapsed (ms):", elapsed);
-            console.log("elapsed (sec):", (elapsed / 1000).toFixed(2));
-            console.log("clamped (ms):", clamped);
-            console.log("now ISO:", new Date(now).toISOString());
-            console.log("start ISO:", new Date(trackStartTimestamp).toISOString());
-            console.log("===================");
-        }
-    
-        return clamped;
-    }
-    
-    async function updateMusic() {
-        try {
-            const response = await fetch('https://slavya.space/bio/proxy.php');
-            const data = await response.json();
-    
-            const container = document.getElementById('track-container');
-            if (!container) return;
-    
-            const user = data?.[ACTIVE_USER];
-    
-            if (user && user.active) {
-                container.style.display = 'block';
-    
-                const newTrackId = user.track_id;
-    
-                if (newTrackId !== lastTrackId) {
-                    lastTrackId = newTrackId;
-    
-                    durationMs = user.duration_ms || 0;
-                    trackStartTimestamp = parseTrackStartTime(user.track_started_at);
-    
-                    currentMs = calculateProgress(true); // DEBUG ТОЛЬКО ПРИ СМЕНЕ ТРЕКА
-    
-                    if (currentMs > durationMs) currentMs = durationMs;
-                    if (currentMs < 0) currentMs = 0;
-                }
-    
-                document.getElementById('track-title').textContent = user.title || '';
-                document.getElementById('track-artist').textContent = user.artist || '';
-                document.getElementById('total-time').textContent = user.duration || '';
-    
-            } else {
-                container.style.display = 'none';
-                lastTrackId = null;
-                currentMs = 0;
-                trackStartTimestamp = 0;
-            }
-    
-        } catch (e) {
-            console.error('Ошибка музыки:', e);
-        }
-    }
-    
-    setInterval(() => {
+
+    return clamped;
+}
+
+async function updateMusic() {
+    try {
+        const response = await fetch('https://slavya.space/bio/proxy.php');
+        const data = await response.json();
+
         const container = document.getElementById('track-container');
-    
-        if (container && container.style.display !== 'none' && durationMs > 0) {
-            currentMs = calculateProgress();
-    
-            if (currentMs > durationMs) currentMs = durationMs;
-            if (currentMs < 0) currentMs = 0;
-    
-            const percent = (currentMs / durationMs) * 100;
-    
-            const progressBar = document.getElementById('progress-bar');
-            const currentTime = document.getElementById('current-time');
-    
-            if (progressBar) {
-                progressBar.style.width = Math.min(percent, 100) + '%';
+        if (!container) return;
+
+        const user = data?.[ACTIVE_USER];
+
+        if (user && user.active) {
+            container.style.display = 'block';
+
+            const newTrackId = user.track_id;
+
+            if (newTrackId !== lastTrackId) {
+                lastTrackId = newTrackId;
+
+                durationMs = user.duration_ms || 0;
+                trackStartTimestamp = parseTrackStartTime(user.track_started_at);
+
+                currentMs = calculateProgress(true);
+
+                if (currentMs > durationMs) currentMs = durationMs;
+                if (currentMs < 0) currentMs = 0;
             }
-    
-            if (currentTime) {
-                currentTime.textContent = formatTime(currentMs);
-            }
+
+            document.getElementById('track-title').textContent = user.title || '';
+            document.getElementById('track-artist').textContent = user.artist || '';
+            document.getElementById('total-time').textContent = user.duration || '';
+
+        } else {
+            container.style.display = 'none';
+            lastTrackId = null;
+            currentMs = 0;
+            trackStartTimestamp = 0;
         }
-    }, 1000);
-    
-    updateMusic();
-    setInterval(updateMusic, 5000);
+
+    } catch (e) {
+        console.error('Ошибка музыки:', e);
+    }
+}
+
+setInterval(() => {
+    const container = document.getElementById('track-container');
+
+    if (container && container.style.display !== 'none' && durationMs > 0) {
+        currentMs = calculateProgress();
+
+        if (currentMs > durationMs) currentMs = durationMs;
+        if (currentMs < 0) currentMs = 0;
+
+        const percent = (currentMs / durationMs) * 100;
+
+        const progressBar = document.getElementById('progress-bar');
+        const currentTime = document.getElementById('current-time');
+
+        if (progressBar) {
+            progressBar.style.width = Math.min(percent, 100) + '%';
+        }
+
+        if (currentTime) {
+            currentTime.textContent = formatTime(currentMs);
+        }
+    }
+}, 1000);
+
+updateMusic();
+setInterval(updateMusic, 5000);
 
 (function () {
     const container = document.getElementById("animated-name");
@@ -663,7 +595,6 @@ document.addEventListener('DOMContentLoaded', () => {
         offset = (offset + speed) % palette.length;
 
         for (let i = 0; i < spans.length; i++) {
-            
             const pos = (i * 1.2 + offset) % palette.length;
 
             const i0 = Math.floor(pos);
